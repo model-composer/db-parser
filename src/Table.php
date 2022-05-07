@@ -16,16 +16,23 @@ class Table
 
 	/**
 	 * @param array $columns
+	 * @param bool $real
 	 * @return void
 	 */
-	public function loadColumns(array $columns): void
+	public function loadColumns(array $columns, bool $real = true): void
 	{
 		foreach ($columns as $k => $c) {
-			if ($c['key'] === 'PRI')
-				$this->primary[] = $k;
+			if ($c['key'] === 'PRI') {
+				if ($real)
+					$this->primary[] = $k;
+				else
+					continue;
+			}
 
-			$c['real'] = true; // To distinguish plugins fake columns
+			if (isset($this->columns[$k]) and !$real)
+				continue;
 
+			$c['real'] = $real;
 			$this->columns[$k] = $c;
 		}
 
@@ -39,7 +46,7 @@ class Table
 	public function loadForeignKeys(array $foreign_keys): void
 	{
 		foreach ($foreign_keys as $fk) {
-			if(!isset($this->columns[$fk['column']]))
+			if (!isset($this->columns[$fk['column']]))
 				throw new \Exception('Something is wrong, column ' . $fk['column'] . ', declared in foreign key ' . $fk['name'] . ' doesn\'t seem to exist!');
 
 			$this->columns[$fk['column']]['foreign_keys'][] = $fk;
