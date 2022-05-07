@@ -23,7 +23,7 @@ class Parser
 	public function getTable(string $name): Table
 	{
 		if (!isset($this->tablesCache[$name])) {
-			$cache = Cache::getCacheAdapter('file');
+			$cache = Cache::getCacheAdapter();
 			$this->tablesCache[$name] = $cache->get('model.db.tables.' . $name, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($name) {
 				$item->tag('db.table');
 				return $this->makeTable($name);
