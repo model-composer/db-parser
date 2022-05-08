@@ -12,6 +12,7 @@
         "psr-4": {"Model\\DbParser\\": "src/"}
     },
     "require": {
-        "model/cache": "^0.1.3"
+        "model/cache": "^0.2.0",
+        "ext-pdo": "*"
     }
 }
