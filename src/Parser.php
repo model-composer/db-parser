@@ -17,6 +17,16 @@ class Parser
 	}
 
 	/**
+	 * Db getter
+	 *
+	 * @return \PDO
+	 */
+	public function getDb(): \PDO
+	{
+		return $this->db;
+	}
+
+	/**
 	 * @param string $name
 	 * @return Table
 	 */
