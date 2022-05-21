@@ -71,7 +71,7 @@ class Parser
 				unset($v);
 				$length = $values;
 			} elseif (preg_match('/^.+\([0-9,]+\).*$/i', $c['Type'])) {
-				$type = strtolower(preg_replace('/^(.+)\([0-9,]+\).*$/i', '\\1', $c['Type']));
+				$type = preg_replace('/^(.+)\([0-9,]+\).*$/i', '\\1', $c['Type']);
 				$length = preg_replace('/^.+\(([0-9,]+)\).*$/i', '\\1', $c['Type']);
 			} else {
 				$type = $c['Type'];
@@ -79,7 +79,7 @@ class Parser
 			}
 
 			$columns[$c['Field']] = [
-				'type' => $type,
+				'type' => strtolower($type),
 				'length' => $length,
 				'null' => $c['Null'] === 'YES',
 				'key' => $c['Key'],
