@@ -37,10 +37,11 @@ class Parser
 			$this->tablesCache[$name] = $cache->get('model.db.tables.' . $name, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($name) {
 				$item->tag('db.table');
 				$item->expiresAfter(3600 * 24 * 30);
+
+				Cache::registerInvalidation('tag', ['db.table']);
+
 				return $this->makeTable($name);
 			});
-
-			Cache::registerInvalidation('tag', ['db.table']);
 		}
 
 		return $this->tablesCache[$name];
