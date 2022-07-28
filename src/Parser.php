@@ -64,6 +64,13 @@ class Parser
 		$explainQuery = $this->db->query('EXPLAIN `' . $name . '`');
 		$columns = [];
 		foreach ($explainQuery as $c) {
+			$unsigned = false;
+			$c['Type'] = strtolower($c['Type']);
+			if (str_ends_with($c['Type'], 'unsigned')) {
+				$c['Type'] = substr($c['type'], 0, -9);
+				$unsigned = true;
+			}
+
 			if (preg_match('/^enum\(.+\).*$/i', $c['Type'])) {
 				$type = 'enum';
 				$values = explode(',', preg_replace('/^enum\((.+)\).*$/i', '$1', $c['Type']));
@@ -85,6 +92,7 @@ class Parser
 				'null' => $c['Null'] === 'YES',
 				'key' => $c['Key'],
 				'default' => $c['Default'],
+				'unsigned' => $unsigned,
 				'extra' => $c['Extra'],
 				'foreign_keys' => [],
 			];
