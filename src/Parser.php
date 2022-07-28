@@ -67,7 +67,7 @@ class Parser
 			$unsigned = false;
 			$c['Type'] = strtolower($c['Type']);
 			if (str_ends_with($c['Type'], 'unsigned')) {
-				$c['Type'] = substr($c['type'], 0, -9);
+				$c['Type'] = substr($c['Type'], 0, -9);
 				$unsigned = true;
 			}
 
