@@ -65,8 +65,7 @@ class Parser
 		$columns = [];
 		foreach ($explainQuery as $c) {
 			$unsigned = false;
-			$c['Type'] = strtolower($c['Type']);
-			if (str_ends_with($c['Type'], 'unsigned')) {
+			if (str_ends_with(strtolower($c['Type']), 'unsigned')) {
 				$c['Type'] = substr($c['Type'], 0, -9);
 				$unsigned = true;
 			}
@@ -79,10 +78,10 @@ class Parser
 				unset($v);
 				$length = $values;
 			} elseif (preg_match('/^.+\([0-9,]+\).*$/i', $c['Type'])) {
-				$type = preg_replace('/^(.+)\([0-9,]+\).*$/i', '\\1', $c['Type']);
+				$type = strtolower(preg_replace('/^(.+)\([0-9,]+\).*$/i', '\\1', $c['Type']));
 				$length = preg_replace('/^.+\(([0-9,]+)\).*$/i', '\\1', $c['Type']);
 			} else {
-				$type = $c['Type'];
+				$type = strtolower($c['Type']);
 				$length = false;
 			}
 
