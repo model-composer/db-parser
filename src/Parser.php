@@ -11,8 +11,9 @@ class Parser
 
 	/**
 	 * @param \PDO $db
+	 * @param string $cachePrefix
 	 */
-	public function __construct(private \PDO $db)
+	public function __construct(private \PDO $db, private string $cachePrefix = '')
 	{
 	}
 
@@ -34,7 +35,7 @@ class Parser
 	{
 		if (!isset($this->tablesCache[$name])) {
 			$cache = Cache::getCacheAdapter();
-			$this->tablesCache[$name] = $cache->get('model.db.tables.' . $name, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($name) {
+			$this->tablesCache[$name] = $cache->get('model.db.tables.' . ($this->cachePrefix ? $this->cachePrefix . '.' : '') . $name, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($name) {
 				$item->tag('db.table');
 				$item->expiresAfter(3600 * 24 * 30);
 
