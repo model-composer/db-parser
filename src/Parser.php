@@ -59,8 +59,7 @@ class Parser
 	 */
 	private function makeTable(string $name): Table
 	{
-		$existingTables = $this->getExistingTables();
-		if (!in_array($name, $existingTables))
+		if (!$this->tableExists($name))
 			throw new \Exception('Table ' . $name . ' does not exist');
 
 		// Create Table object
@@ -146,9 +145,19 @@ class Parser
 	}
 
 	/**
+	 * @param string $table
+	 * @return bool
+	 */
+	public function tableExists(string $table): bool
+	{
+		$existingTables = $this->getTables();
+		return in_array($table, $existingTables);
+	}
+
+	/**
 	 * @return array
 	 */
-	private function getExistingTables(): array
+	public function getTables(): array
 	{
 		if (!isset($this->tablesList)) {
 			$this->tablesList = [];
