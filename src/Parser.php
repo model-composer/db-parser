@@ -35,14 +35,9 @@ class Parser
 	{
 		if (!isset($this->tablesCache[$name])) {
 			$cache = Cache::getCacheAdapter();
-			$cacheKey = 'model.db.tables.' . ($this->cachePrefix ? $this->cachePrefix . '.' : '') . $name;
-			$this->tablesCache[$name] = $cache->get($cacheKey, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($cache, $name) {
+			$this->tablesCache[$name] = $cache->get($this->getBaseCacheKey() . 'tables.' . $name, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($cache, $name) {
 				$item->expiresAfter(3600 * 24 * 30);
-
-				if (Cache::isTagAware($cache))
-					$item->tag('db.table');
-
-				return $this->makeTable($name);
+				return $this->doGetTable($name);
 			});
 		}
 
@@ -53,7 +48,7 @@ class Parser
 	 * @param string $name
 	 * @return Table
 	 */
-	private function makeTable(string $name): Table
+	private function doGetTable(string $name): Table
 	{
 		if (!$this->tableExists($name))
 			throw new \Exception('Table ' . $name . ' does not exist');
@@ -150,12 +145,26 @@ class Parser
 		return in_array($table, $existingTables);
 	}
 
+	private function getBaseCacheKey(): string
+	{
+		return 'model.db.parser.' . ($this->cachePrefix ? $this->cachePrefix . '.' : '');
+	}
+
 	/**
 	 * @return void
 	 */
 	public function flush(): void
 	{
+		$cache = Cache::getCacheAdapter();
+		$cache->deleteItem($this->getBaseCacheKey() . '.list');
 		$this->tablesList = null;
+
+		foreach ($this->getTables() as $table)
+			$cache->deleteItem($this->getBaseCacheKey() . 'tables.' . $table);
+
+		$cache->deleteItem($this->getBaseCacheKey() . '.list');
+		$this->tablesList = null;
+
 		$this->tablesCache = [];
 	}
 
@@ -165,10 +174,17 @@ class Parser
 	public function getTables(): array
 	{
 		if ($this->tablesList === null) {
-			$this->tablesList = [];
-			$tables = $this->db->query('SHOW TABLES');
-			foreach ($tables as $row)
-				$this->tablesList[] = $row[array_keys($row)[0]];
+			$cache = Cache::getCacheAdapter();
+			$this->tablesList = $cache->get($this->getBaseCacheKey() . '.list', function (\Symfony\Contracts\Cache\ItemInterface $item) use ($cache) {
+				$item->expiresAfter(3600 * 24);
+
+				$list = [];
+				$tables = $this->db->query('SHOW TABLES');
+				foreach ($tables as $row)
+					$list[] = $row[array_keys($row)[0]];
+
+				return $list;
+			});
 		}
 
 		return $this->tablesList;
