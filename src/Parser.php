@@ -5,7 +5,7 @@ use Model\Cache\Cache;
 class Parser
 {
 	/** @var string[] */
-	private array $tablesList;
+	private ?array $tablesList;
 	/** @var Table[] */
 	private array $tablesCache = [];
 
@@ -151,11 +151,20 @@ class Parser
 	}
 
 	/**
+	 * @return void
+	 */
+	public function flush(): void
+	{
+		$this->tablesList = null;
+		$this->tablesCache = [];
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getTables(): array
 	{
-		if (!isset($this->tablesList)) {
+		if ($this->tablesList === null) {
 			$this->tablesList = [];
 			$tables = $this->db->query('SHOW TABLES');
 			foreach ($tables as $row)
