@@ -36,15 +36,11 @@ class Parser
 		if (!isset($this->tablesCache[$name])) {
 			$cache = Cache::getCacheAdapter();
 			$cacheKey = 'model.db.tables.' . ($this->cachePrefix ? $this->cachePrefix . '.' : '') . $name;
-			$this->tablesCache[$name] = $cache->get($cacheKey, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($cache, $name, $cacheKey) {
+			$this->tablesCache[$name] = $cache->get($cacheKey, function (\Symfony\Contracts\Cache\ItemInterface $item) use ($cache, $name) {
 				$item->expiresAfter(3600 * 24 * 30);
 
-				if (Cache::isTagAware($cache)) {
+				if (Cache::isTagAware($cache))
 					$item->tag('db.table');
-					Cache::registerInvalidation('tag', ['db.table']);
-				} else {
-					Cache::registerInvalidation('keys', [$cacheKey]);
-				}
 
 				return $this->makeTable($name);
 			});
