@@ -5,7 +5,7 @@ use Model\Cache\Cache;
 class Parser
 {
 	/** @var string[] */
-	private ?array $tablesList;
+	private ?array $tablesList = null;
 	/** @var Table[] */
 	private array $tablesCache = [];
 
